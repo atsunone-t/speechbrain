@@ -5,8 +5,8 @@ Author
  * Cem Subakan 2020
 """
 
-import os
 import csv
+import os
 
 
 def prepare_librimix(
@@ -36,14 +36,10 @@ def prepare_librimix(
     if "Libri" in datapath:
         # Libri 2/3Mix datasets
         if n_spks == 2:
-            assert (
-                "Libri2Mix" in datapath
-            ), "Inconsistent number of speakers and datapath"
+            assert "MiniLibriMix" in datapath, "Inconsistent number of speakers and datapath"
             create_libri2mix_csv(datapath, savepath, addnoise=librimix_addnoise)
         elif n_spks == 3:
-            assert (
-                "Libri3Mix" in datapath
-            ), "Inconsistent number of speakers and datapath"
+            assert "Libri3Mix" in datapath, "Inconsistent number of speakers and datapath"
             create_libri3mix_csv(datapath, savepath, addnoise=librimix_addnoise)
         else:
             raise ValueError("Unsupported Number of Speakers")
@@ -56,7 +52,7 @@ def create_libri2mix_csv(
     savepath,
     addnoise=False,
     version="wav8k/min/",
-    set_types=["train-360", "dev", "test"],
+    set_types=["train", "val"],
 ):
     """
     This functions creates the .csv file for the libri2mix dataset
@@ -64,13 +60,14 @@ def create_libri2mix_csv(
 
     for set_type in set_types:
         if addnoise:
-            mix_path = os.path.join(datapath, version, set_type, "mix_both/")
+            # mix_path = os.path.join(datapath, version, set_type, "mix_both/")
+            mix_path = os.path.join(datapath, set_type, "mix_both/")
         else:
-            mix_path = os.path.join(datapath, version, set_type, "mix_clean/")
+            mix_path = os.path.join(datapath, set_type, "mix_clean/")
 
-        s1_path = os.path.join(datapath, version, set_type, "s1/")
-        s2_path = os.path.join(datapath, version, set_type, "s2/")
-        noise_path = os.path.join(datapath, version, set_type, "noise/")
+        s1_path = os.path.join(datapath, set_type, "s1/")
+        s2_path = os.path.join(datapath, set_type, "s2/")
+        noise_path = os.path.join(datapath, set_type, "noise/")
 
         files = os.listdir(mix_path)
 
@@ -96,13 +93,12 @@ def create_libri2mix_csv(
             "noise_wav_opts",
         ]
 
-        with open(savepath + "/libri2mix_" + set_type + ".csv", "w") as csvfile:
+        with open(savepath + "/Minilibrimix_" + set_type + ".csv", "w") as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
             writer.writeheader()
             for i, (mix_path, s1_path, s2_path, noise_path) in enumerate(
                 zip(mix_fl_paths, s1_fl_paths, s2_fl_paths, noise_fl_paths)
             ):
-
                 row = {
                     "ID": i,
                     "duration": 1.0,
